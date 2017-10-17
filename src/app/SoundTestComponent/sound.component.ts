@@ -14,38 +14,45 @@ export class SoundTestComponent implements OnInit {
 
     ngOnInit() {
 
-        if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+        if ( ! Detector.webgl ) {
+            Detector.addGetWebGLMessage();
+        }
         let container;
         let camera, scene, renderer, controls;
-        let light, pointLight;
-        let material1, material2, material3;
-        let analyser1, analyser2, analyser3;
-        let clock = new THREE.Clock();
+        let light;
+        let material1;
+        let analyser1;
+        const clock = new THREE.Clock();
 
         init();
 
         animate();
         function init() {
             container = document.getElementById( 'container' );
-            camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+            camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
             camera.position.set( 0, 25, 0 );
-            let listener = new THREE.AudioListener();
+            const listener = new THREE.AudioListener();
             camera.add( listener );
             scene = new THREE.Scene();
             scene.fog = new THREE.FogExp2( 0x000000, 0.0025 );
             light = new THREE.DirectionalLight( 0xffffff );
             light.position.set( 0, 0.5, 1 ).normalize();
             scene.add( light );
-            let sphere = new THREE.SphereGeometry( 20, 32, 16 );
-            material1 = new THREE.MeshPhongMaterial( { color: 0xffaa00, flatShading: true, shininess: 0 } );
+            const sphere = new THREE.TetrahedronBufferGeometry( 18, 5 );
+            material1 = new THREE.MeshPhongMaterial( {
+                color: 0xffaa00,
+                flatShading: true,
+                shininess: 0,
+                morphTargets: true
+            } );
 
             // sound spheres
-            let audioLoader = new THREE.AudioLoader();
-            let mesh1 = new THREE.Mesh( sphere, material1 );
+            const audioLoader = new THREE.AudioLoader();
+            const mesh1 = new THREE.Mesh( sphere, material1 );
 
             mesh1.position.set( -250, 30, 0 );
             scene.add( mesh1 );
-            let sound1 = new THREE.PositionalAudio( listener );
+            const sound1 = new THREE.PositionalAudio( listener );
             audioLoader.load( '../assets/sounds/josh_pan-i_used_to.mp3', function( buffer ) {
                 sound1.setBuffer( buffer );
                 sound1.setRefDistance( 20 );
@@ -53,7 +60,7 @@ export class SoundTestComponent implements OnInit {
             });
             mesh1.add( sound1 );
 
-            let oscillator = listener.context.createOscillator();
+            const oscillator = listener.context.createOscillator();
             oscillator.type = 'sine';
             oscillator.frequency.value = 144;
             oscillator.start(0);
@@ -61,23 +68,23 @@ export class SoundTestComponent implements OnInit {
             // analysers
             analyser1 = new THREE.AudioAnalyser( sound1, 32 );
             // ground
-            let helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
+            const helper = new THREE.GridHelper( 1000, 10, 0x444444, 0x444444 );
             helper.position.y = 0.1;
             scene.add( helper );
             //
-            let SoundControls = function() {
+            const SoundControls = function() {
                 this.master = listener.getMasterVolume();
                 this.firstSphere =  sound1.getVolume();
             };
-            let GeneratorControls = function() {
+            const GeneratorControls = function() {
                 this.frequency = oscillator.frequency.value;
                 this.wavetype = oscillator.type;
             };
-            let gui = new dat.GUI();
-            let soundControls = new SoundControls();
-            let generatorControls = new GeneratorControls();
-            let volumeFolder = gui.addFolder('sound volume');
-            let generatorFolder = gui.addFolder('sound generator');
+            const gui = new dat.GUI();
+            const soundControls = new SoundControls();
+            const generatorControls = new GeneratorControls();
+            const volumeFolder = gui.addFolder('sound volume');
+            const generatorFolder = gui.addFolder('sound generator');
 
             volumeFolder.add(soundControls, 'master').min(0.0).max(1.0).step(0.01).onChange(function() {
                 listener.setMasterVolume(soundControls.master);
@@ -97,7 +104,7 @@ export class SoundTestComponent implements OnInit {
             renderer = new THREE.WebGLRenderer( { antialias: true } );
             renderer.setPixelRatio( window.devicePixelRatio );
             renderer.setSize( window.innerWidth, window.innerHeight );
-            container.innerHTML = "";
+            container.innerHTML = '';
             container.appendChild( renderer.domElement );
             //
             controls = new THREE.FirstPersonControls( camera, renderer.domElement );
@@ -119,11 +126,11 @@ export class SoundTestComponent implements OnInit {
         }
 
         function render() {
-            let delta = clock.getDelta();
+            const delta = clock.getDelta();
             controls.update( delta );
             material1.emissive.b = analyser1.getAverageFrequency() / 256;
-            //material2.emissive.b = analyser2.getAverageFrequency() / 256;
-            //material3.emissive.b = analyser3.getAverageFrequency() / 256;
+            // this.mesh1.
+            console.log(analyser1.getFrequencyData()[0]);
             renderer.render( scene, camera );
         }
 
