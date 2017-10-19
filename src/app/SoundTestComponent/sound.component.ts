@@ -24,11 +24,10 @@ export class SoundTestComponent implements OnInit {
     clock = new THREE.Clock();
 
 
-    ngOnInit(){
+    ngOnInit() {
         if ( ! Detector.webgl ) {
             Detector.addGetWebGLMessage();
         }
-
 
         this.init();
 
@@ -38,7 +37,7 @@ export class SoundTestComponent implements OnInit {
 
 
     init() {
-        const lengthOfAnalyzer = 32;
+        const lengthOfAnalyzer = 64;
         this.container = document.getElementById( 'container' );
         this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
         this.camera.position.set( 0, 25, 0 );
@@ -49,7 +48,7 @@ export class SoundTestComponent implements OnInit {
         this.light = new THREE.DirectionalLight( 0xffffff );
         this.light.position.set( 0, 2, 5 ).normalize();
         this.scene.add( this.light );
-        let sphere = new THREE.SphereBufferGeometry( 16, 32, 32, 6, 6.3, 0, 3.3 );
+        let sphere = new THREE.BoxBufferGeometry( 10, 10, 10 );
         this.material1 = new THREE.MeshPhongMaterial( {
             color: 0xffaa00,
             flatShading: true,
@@ -70,7 +69,7 @@ export class SoundTestComponent implements OnInit {
         for (let i = 0; i < lengthOfAnalyzer / 2; i++) {
             const mesh = new THREE.Mesh( sphere, this.material1 );
             this.mesh.push(mesh);
-            this.mesh[i].position.set( 50 * i, 30, 0 );
+            this.mesh[i].position.set( 12 * i, 30, 0 );
             this.scene.add( this.mesh[i] );
             this.mesh[i].add( sound1 );
         }
@@ -148,7 +147,7 @@ export class SoundTestComponent implements OnInit {
         // this.mesh1.
         // console.log('this is what we are getting' + this.mesh1);
         for (let i = 0; i < this.mesh.length; i++) {
-            this.mesh[i].scale.set((this.analyser1.getFrequencyData()[i]/75), (this.analyser1.getFrequencyData()[i]/75), (this.analyser1.getFrequencyData()[i]/75) );
+            this.mesh[i].scale.set(1, (this.analyser1.getFrequencyData()[i])/10, 1 );
         }
         this.renderer.render( this.scene, this.camera );
     }
